@@ -17,6 +17,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getTokenLargestAccounts(pubkey: String, commitment: Commitment? = nil) async throws -> [TokenAmount] {
+        try await withCheckedThrowingContinuation { c in
+            self.getTokenLargestAccounts(pubkey: pubkey, commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetTokenLargestAccounts: ApiTemplate {
         public init(pubkey: String, commitment: Commitment? = nil) {

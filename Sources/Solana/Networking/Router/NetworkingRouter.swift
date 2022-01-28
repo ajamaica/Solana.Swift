@@ -108,4 +108,17 @@ public class NetworkingRouter: SolanaRouter {
         }
         .run(onComplete)
     }
+    
+    @available(iOS 13.0, *)
+@available(macOS 10.15, *)
+    public func request<T: Decodable>(method: HTTPMethod = .post, bcMethod: String = #function, parameters: [Encodable?] = []) async throws -> T {
+        try await withCheckedThrowingContinuation { c in
+            self.request(
+                method: method,
+                bcMethod: bcMethod,
+                parameters: parameters,
+                onComplete: c.resume(with:)
+            )
+        }
+    }
 }

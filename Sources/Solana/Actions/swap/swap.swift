@@ -297,6 +297,40 @@ extension Action {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Action {
+    func swap(
+        account: Account? = nil,
+        pool: Pool? = nil,
+        source: PublicKey,
+        sourceMint: PublicKey,
+        destination: PublicKey? = nil,
+        destinationMint: PublicKey,
+        slippage: Double,
+        amount: UInt64
+    ) async throws -> SwapResponse {
+        try await withCheckedThrowingContinuation { c in
+            self.swap(
+                account: account,
+                pool: pool,
+                source: source,
+                sourceMint: sourceMint,
+                destination: destination,
+                destinationMint: destinationMint,
+                slippage: slippage,
+                amount: amount,
+                onComplete: c.resume(with:)
+            )
+        }
+    }
+    func getAccountInfoData(account: String, tokenProgramId: PublicKey) async throws -> AccountInfo {
+        try await withCheckedThrowingContinuation { c in
+            self.getAccountInfoData(account: account, tokenProgramId: tokenProgramId, onComplete: c.resume(with:))
+        }
+    }
+}
+
 extension ActionTemplates {
     public struct Swap: ActionTemplate {
         public init(account: Account? = nil,

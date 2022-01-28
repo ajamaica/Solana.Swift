@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getMinimumBalanceForRentExemption(dataLength: UInt64, commitment: Commitment? = "recent") async throws -> UInt64 {
+        try await withCheckedThrowingContinuation { c in
+            self.getMinimumBalanceForRentExemption(dataLength: dataLength, commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetMinimumBalanceForRentExemption: ApiTemplate {
         public init(dataLength: UInt64, commitment: Commitment? = nil) {

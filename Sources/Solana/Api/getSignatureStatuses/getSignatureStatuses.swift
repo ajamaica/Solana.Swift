@@ -17,6 +17,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getSignatureStatuses(pubkeys: [String], configs: RequestConfiguration? = nil) async throws -> [SignatureStatus?] {
+        try await withCheckedThrowingContinuation { c in
+            self.getSignatureStatuses(pubkeys: pubkeys, configs: configs, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetSignatureStatuses: ApiTemplate {
         public init(pubkeys: [String], configs: RequestConfiguration? = nil) {

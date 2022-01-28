@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getFirstAvailableBlock() async throws -> UInt64 {
+        try await withCheckedThrowingContinuation { c in
+            self.getFirstAvailableBlock(onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetFirstAvailableBlock: ApiTemplate {
         public init() {}

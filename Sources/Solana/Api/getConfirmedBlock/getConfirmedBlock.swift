@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getConfirmedBlock(slot: UInt64, encoding: String = "json") async throws -> ConfirmedBlock {
+        try await withCheckedThrowingContinuation { c in
+            self.getConfirmedBlock(slot: slot, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetConfirmedBlock: ApiTemplate {
         public init(slot: UInt64, encoding: String = "json") {

@@ -49,6 +49,21 @@ public extension Action {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Action {
+    func getMintData(mintAddress: PublicKey, programId: PublicKey = .tokenProgramId) async throws -> Mint {
+        try await withCheckedThrowingContinuation { c in
+            self.getMintData(mintAddress: mintAddress, programId: programId, onComplete: c.resume(with:))
+        }
+    }
+    func getMultipleMintDatas(mintAddresses: [PublicKey], programId: PublicKey = .tokenProgramId) async throws -> [PublicKey: Mint] {
+        try await withCheckedThrowingContinuation { c in
+            self.getMultipleMintDatas(mintAddresses: mintAddresses, programId: programId, onComplete: c.resume(with:))
+        }
+    }
+}
+
 extension ActionTemplates {
     public struct GetMintData: ActionTemplate {
         public init(programId: PublicKey = .tokenProgramId, mintAddress: PublicKey) {

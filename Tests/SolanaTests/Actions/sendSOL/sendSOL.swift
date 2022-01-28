@@ -1,6 +1,8 @@
 import XCTest
 import Solana
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
 class sendSOL: XCTestCase {
     var endpoint = RPCEndpoint.devnetSolana
     var solana: Solana!
@@ -13,38 +15,44 @@ class sendSOL: XCTestCase {
         try solana.auth.save(account).get()
     }
     
-    func testSendSOLFromBalance() {
+    func testSendSOLFromBalance() async throws {
         let toPublicKey = "3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"
 
-        let balance = try! solana.api.getBalance()?.get()
+        let balance = try await solana.api.getBalance(account: nil, commitment: nil)
         XCTAssertNotNil(balance)
 
-        let transactionId = try! solana.action.sendSOL(
+        let transactionId = try await solana.action.sendSOL(
             to: toPublicKey,
-            amount: balance!/10
-        )?.get()
+            amount: balance/10
+        )
         XCTAssertNotNil(transactionId)
     }
-    func testSendSOL() {
+    
+    func testSendSOL() async throws {
         let toPublicKey = "3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"
-        let transactionId = try! solana.action.sendSOL(
+        let transactionId = try await solana.action.sendSOL(
             to: toPublicKey,
             amount: 0.001.toLamport(decimals: 9)
-        )?.get()
+        )
         XCTAssertNotNil(transactionId)
     }
-    func testSendSOLIncorrectDestination() {
+    func testSendSOLIncorrectDestination() async {
         let toPublicKey = "XX"
-        XCTAssertThrowsError(try solana.action.sendSOL(
-            to: toPublicKey,
-            amount: 0.001.toLamport(decimals: 9)
-        )?.get())
+        await asyncAssertThrowing("sendSOL should fail when destination is incorrect") {
+            try await solana.action.sendSOL(
+                to: toPublicKey,
+                amount: 0.001.toLamport(decimals: 9)
+            )
+        }
     }
-    func testSendSOLBigAmmount() {
+    func testSendSOLBigAmmount() async {
         let toPublicKey = "3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"
-        XCTAssertThrowsError(try solana.action.sendSOL(
-            to: toPublicKey,
-            amount: 9223372036854775808
-        )?.get())
+        await asyncAssertThrowing("sendSOL should fail when amount is too big") {
+            try await solana.action.sendSOL(
+                to: toPublicKey,
+                amount: 9223372036854775808
+            )
+        }
+
     }
 }

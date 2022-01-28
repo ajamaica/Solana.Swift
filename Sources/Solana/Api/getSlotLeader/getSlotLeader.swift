@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getSlotLeader(commitment: Commitment? = nil) async throws -> String {
+        try await withCheckedThrowingContinuation { c in
+            self.getSlotLeader(commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetSlotLeader: ApiTemplate {
         public init(commitment: Commitment? = nil) {

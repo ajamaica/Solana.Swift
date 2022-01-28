@@ -21,6 +21,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getTokenAccountBalance(pubkey: String, commitment: Commitment? = nil) async throws -> TokenAccountBalance {
+        try await withCheckedThrowingContinuation { c in
+            self.getTokenAccountBalance(pubkey: pubkey, commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetTokenAccountBalance: ApiTemplate {
         public init(pubkey: String, commitment: Commitment? = nil) {

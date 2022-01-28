@@ -17,6 +17,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getSupply(commitment: Commitment? = nil) async throws -> Supply {
+        try await withCheckedThrowingContinuation { c in
+            self.getSupply(commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetSupply: ApiTemplate {
         public init(commitment: Commitment? = nil) {

@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getGenesisHash() async throws -> String {
+        try await withCheckedThrowingContinuation { c in
+            self.getGenesisHash(onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetGenesisHash: ApiTemplate {
         public init() {}

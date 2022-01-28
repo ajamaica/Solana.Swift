@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getVoteAccounts(commitment: Commitment? = nil) async throws -> VoteAccounts {
+        try await withCheckedThrowingContinuation { c in
+            self.getVoteAccounts(commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetVoteAccounts: ApiTemplate {
         public init(commitment: Commitment? = nil) {

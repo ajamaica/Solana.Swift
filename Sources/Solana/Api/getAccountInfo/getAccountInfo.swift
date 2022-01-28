@@ -18,6 +18,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getAccountInfo<T: BufferLayout>(account: String, decodedTo: T.Type = T.self) async throws -> BufferInfo<T> {
+        try await withCheckedThrowingContinuation { c in
+            self.getAccountInfo(account: account, decodedTo: decodedTo, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetAccountInfo<T: BufferLayout>: ApiTemplate {
         public init(account: String, decodedTo: T.Type) {

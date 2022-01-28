@@ -17,6 +17,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getFeeRateGovernor() async throws -> Fee {
+        try await withCheckedThrowingContinuation { c in
+            self.getFeeRateGovernor(onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetFeeRateGovernor: ApiTemplate {
         public init() {}

@@ -19,6 +19,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func simulateTransaction(transaction: String, configs: RequestConfiguration = RequestConfiguration(encoding: "base64")!) async throws -> TransactionStatus {
+        try await withCheckedThrowingContinuation { c in
+            self.simulateTransaction(transaction: transaction, configs: configs, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct SimulateTransaction: ApiTemplate {
         public init(transaction: String,

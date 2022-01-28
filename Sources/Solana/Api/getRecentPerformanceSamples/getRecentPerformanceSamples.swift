@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getRecentPerformanceSamples(limit: UInt64) async throws -> [PerformanceSample] {
+        try await withCheckedThrowingContinuation { c in
+            self.getRecentPerformanceSamples(limit: limit, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetRecentPerformanceSamples: ApiTemplate {
         public init(limit: UInt64) {

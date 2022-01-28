@@ -1,6 +1,8 @@
 import XCTest
 @testable import Solana
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
 class getMintData: XCTestCase {
     var endpoint = RPCEndpoint.devnetSolana
     var solana: Solana!
@@ -13,18 +15,18 @@ class getMintData: XCTestCase {
         try solana.auth.save(account).get()
     }
     
-    func testGetMintData() {
-        let data: Mint? = try! solana.action.getMintData(mintAddress: PublicKey(string: "8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")!)?.get()
+    func testGetMintData() async throws {
+        let data: Mint? = try await solana.action.getMintData(mintAddress: PublicKey(string: "8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")!)
         XCTAssertNotNil(data)
     }
     
-    func testGetMultipleMintDatas() {
-        let datas: [PublicKey: Mint]? = try! solana.action.getMultipleMintDatas(mintAddresses: [PublicKey(string: "8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")!])?.get()
+    func testGetMultipleMintDatas() async throws {
+        let datas: [PublicKey: Mint]? = try await solana.action.getMultipleMintDatas(mintAddresses: [PublicKey(string: "8wzZaGf89zqx7PRBoxk9T6QyWWQbhwhdU555ZxRnceG3")!])
         XCTAssertNotNil(datas)
     }
     
-    func testGetPools() {
-        let pools: [Pool]? = try! solana.action.getSwapPools()?.get()
+    func testGetPools() async throws {
+        let pools: [Pool]? = try await solana.action.getSwapPools()
         XCTAssertNotNil(pools)
         XCTAssertNotEqual(pools!.count, 0)
     }

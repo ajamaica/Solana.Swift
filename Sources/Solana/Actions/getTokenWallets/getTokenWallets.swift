@@ -25,6 +25,17 @@ extension Action {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Action {
+    func getTokenWallets(account: String? = nil) async throws -> [Wallet] {
+        try await withCheckedThrowingContinuation { c in
+            self.getTokenWallets(account: account, onComplete: c.resume(with:))
+        }
+    }
+}
+
+
 extension ActionTemplates {
     public struct GetTokenWallets: ActionTemplate {
         public init(account: String? = nil) {

@@ -13,6 +13,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getInflationRate() async throws -> InflationRate {
+        try await withCheckedThrowingContinuation { c in
+            self.getInflationRate(onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetInflationRate: ApiTemplate {
         public init() {}

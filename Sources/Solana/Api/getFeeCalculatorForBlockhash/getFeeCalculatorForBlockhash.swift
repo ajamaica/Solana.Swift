@@ -17,6 +17,16 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getFeeCalculatorForBlockhash(blockhash: String, commitment: Commitment? = nil) async throws -> Fee {
+        try await withCheckedThrowingContinuation { c in
+            self.getFeeCalculatorForBlockhash(blockhash: blockhash, commitment: commitment, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetFeeCalculatorForBlockhash: ApiTemplate {
         public init(blockhash: String, commitment: Commitment? = nil) {

@@ -1,6 +1,8 @@
 import XCTest
 @testable import Solana
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
 class serializeAndSendWithFee: XCTestCase {
     var endpoint = RPCEndpoint.devnetSolana
     var solana: Solana!
@@ -13,10 +15,10 @@ class serializeAndSendWithFee: XCTestCase {
         try solana.auth.save(account).get()
     }
 
-    func testSimulationSerializeAndSend() {
+    func testSimulationSerializeAndSend() async throws {
         let toPublicKey = "3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"
 
-        let balance = try! solana.api.getBalance()?.get()
+        let balance = try await solana.api.getBalance()
         XCTAssertNotNil(balance)
 
         let instruction = SystemProgram.transferInstruction(
@@ -25,14 +27,14 @@ class serializeAndSendWithFee: XCTestCase {
             lamports: 0.001.toLamport(decimals: 9)
         )
         
-        let transactionId = try! solana.action.serializeAndSendWithFeeSimulation(instructions: [instruction], signers: [account])?.get()
+        let transactionId = try await solana.action.serializeAndSendWithFeeSimulation(instructions: [instruction], signers: [account])
         XCTAssertNotNil(transactionId)
     }
     
-    func testSerializeAndSend() {
+    func testSerializeAndSend() async throws {
         let toPublicKey = "3h1zGmCwsRJnVk5BuRNMLsPaQu1y2aqXqXDWYCgrp5UG"
 
-        let balance = try! solana.api.getBalance()?.get()
+        let balance = try await solana.api.getBalance()
         XCTAssertNotNil(balance)
 
         let instruction = SystemProgram.transferInstruction(
@@ -41,7 +43,7 @@ class serializeAndSendWithFee: XCTestCase {
             lamports: 0.001.toLamport(decimals: 9)
         )
         
-        let transactionId = try! solana.action.serializeAndSendWithFee( instructions: [instruction], signers: [account])?.get()
+        let transactionId = try await solana.action.serializeAndSendWithFee( instructions: [instruction], signers: [account])
         XCTAssertNotNil(transactionId)
     }
     

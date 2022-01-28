@@ -16,6 +16,18 @@ public extension Api {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Api {
+    func getProgramAccounts<T: BufferLayout>(publicKey: String,
+                                             configs: RequestConfiguration? = RequestConfiguration(encoding: "base64"),
+                                             decodedTo: T.Type = T.self) async throws -> [ProgramAccount<T>] {
+        try await withCheckedThrowingContinuation { c in
+            self.getProgramAccounts(publicKey: publicKey, configs: configs, decodedTo: decodedTo, onComplete: c.resume(with:))
+        }
+    }
+}
+
 public extension ApiTemplates {
     struct GetProgramAccounts<T: BufferLayout>: ApiTemplate {
         public init(publicKey: String, configs: RequestConfiguration? = RequestConfiguration(encoding: "base64"), decodedTo: T.Type) {

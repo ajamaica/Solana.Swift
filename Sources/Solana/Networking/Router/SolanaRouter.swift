@@ -7,6 +7,9 @@ import Foundation
  */
 public protocol SolanaRouter {
     func request<T>(method: HTTPMethod, bcMethod: String, parameters: [Encodable?], onComplete: @escaping (Result<T, Error>) -> Void) where T : Decodable
+    @available(iOS 13.0, *)
+@available(macOS 10.15, *)
+    func request<T>(method: HTTPMethod, bcMethod: String, parameters: [Encodable?]) async throws -> T where T : Decodable
 
     var endpoint: RPCEndpoint  { get }
 }

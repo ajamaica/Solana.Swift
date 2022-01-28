@@ -65,6 +65,19 @@ extension Action {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Action {
+    func sendSOL(
+        to destination: String,
+        amount: UInt64
+    ) async throws -> TransactionID {
+        try await withCheckedThrowingContinuation { c in
+            self.sendSOL(to: destination, amount: amount, onComplete: c.resume(with:))
+        }
+    }
+}
+
 extension ActionTemplates {
     public struct SendSOL: ActionTemplate {
         public init(amount: UInt64, destination: String) {

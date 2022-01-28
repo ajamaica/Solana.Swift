@@ -103,6 +103,24 @@ extension Action {
     }
 }
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+public extension Action {
+    func getCreatingTokenAccountFee() async throws -> UInt64 {
+        try await withCheckedThrowingContinuation { c in
+            self.getCreatingTokenAccountFee(onComplete: c.resume(with:))
+        }
+    }
+    
+    func createTokenAccount(
+        mintAddress: String
+    ) async throws -> (signature: String, newPubkey: String) {
+        try await withCheckedThrowingContinuation { c in
+            self.createTokenAccount(mintAddress: mintAddress, onComplete: c.resume(with:))
+        }
+    }
+}
+
 extension ActionTemplates {
     public struct GetCreatingTokenAccountFee: ActionTemplate {
         public typealias Success = UInt64

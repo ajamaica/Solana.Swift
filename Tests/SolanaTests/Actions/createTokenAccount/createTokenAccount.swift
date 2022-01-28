@@ -1,6 +1,8 @@
 import XCTest
 import Solana
 
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
 class createTokenAccount: XCTestCase {
     var endpoint = RPCEndpoint.devnetSolana
     var solana: Solana!
@@ -13,9 +15,9 @@ class createTokenAccount: XCTestCase {
         try solana.auth.save(account).get()
     }
     
-    func testCreateTokenAccount() {
+    func testCreateTokenAccount() async throws {
         let mintAddress = "6AUM4fSvCAxCugrbJPFxTqYFp9r3axYx973yoSyzDYVH"
-        let account: (signature: String, newPubkey: String)? = try! solana.action.createTokenAccount( mintAddress: mintAddress)?.get()
+        let account: (signature: String, newPubkey: String)? = try await solana.action.createTokenAccount( mintAddress: mintAddress)
         XCTAssertNotNil(account)
     }
     
