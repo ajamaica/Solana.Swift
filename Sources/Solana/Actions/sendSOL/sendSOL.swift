@@ -5,6 +5,7 @@ extension Action {
         to destination: String,
         from: Account,
         amount: UInt64,
+        allowUnfundedRecipient: Bool = false,
         onComplete: @escaping ((Result<TransactionID, Error>) -> Void)
     ) {
         let account = from
@@ -15,50 +16,63 @@ extension Action {
         }
 
         // check
-        self.api.getAccountInfo(account: destination, decodedTo: EmptyInfo.self) { resultInfo in
+        if allowUnfundedRecipient {
+            serializeAndSend(from: fromPublicKey, to: destination, amount: amount, signer: account, onComplete: onComplete)
+        } else {
+            self.api.getAccountInfo(account: destination, decodedTo: EmptyInfo.self) { resultInfo in
+                if case Result.failure( let error) = resultInfo {
+                    if let solanaError = error as? SolanaError,
+                       case SolanaError.couldNotRetriveAccountInfo = solanaError {
+                        // let request through
+                    } else {
+                        onComplete(.failure(error))
+                        return
+                    }
+                }
 
-            if case Result.failure( let error) = resultInfo {
-                if let solanaError = error as? SolanaError,
-                   case SolanaError.couldNotRetriveAccountInfo = solanaError {
-                    // let request through
-                } else {
-                    onComplete(.failure(error))
+                guard case Result.success(let info) = resultInfo else {
+                    onComplete(.failure(SolanaError.couldNotRetriveAccountInfo))
                     return
                 }
-            }
 
-            guard case Result.success(let info) = resultInfo else {
-                onComplete(.failure(SolanaError.couldNotRetriveAccountInfo))
-                return
-            }
-
-            guard info.owner == PublicKey.programId.base58EncodedString else {
-                onComplete(.failure(SolanaError.other("Invalid account info")))
-                return
-            }
-            guard let to = PublicKey(string: destination) else {
-                onComplete(.failure(SolanaError.invalidPublicKey))
-                return
-            }
-
-            let instruction = SystemProgram.transferInstruction(
-                from: fromPublicKey,
-                to: to,
-                lamports: amount
-            )
-            self.serializeAndSendWithFee(
-                instructions: [instruction],
-                signers: [account]
-            ) {
-                switch $0 {
-                case .success(let transaction):
-                    onComplete(.success(transaction))
-                case .failure(let error):
-                    onComplete(.failure(error))
+                guard info.owner == PublicKey.programId.base58EncodedString else {
+                    onComplete(.failure(SolanaError.other("Invalid account info")))
+                    return
                 }
+
+                self.serializeAndSend(from: fromPublicKey, to: destination, amount: amount, signer: account, onComplete: onComplete)
             }
         }
+    }
 
+    fileprivate func serializeAndSend(
+        from fromPublicKey: PublicKey,
+        to destination: String,
+        amount: UInt64,
+        signer: Account,
+        onComplete: @escaping ((Result<TransactionID, Error>) -> Void)
+    ) {
+        guard let to = PublicKey(string: destination) else {
+            onComplete(.failure(SolanaError.invalidPublicKey))
+            return
+        }
+
+        let instruction = SystemProgram.transferInstruction(
+            from: fromPublicKey,
+            to: to,
+            lamports: amount
+        )
+        self.serializeAndSendWithFee(
+            instructions: [instruction],
+            signers: [signer]
+        ) {
+            switch $0 {
+            case .success(let transaction):
+                onComplete(.success(transaction))
+            case .failure(let error):
+                onComplete(.failure(error))
+            }
+        }
     }
 }
 
