@@ -20,6 +20,7 @@ Please check my wallet [Summer](https://github.com/ajamaica/Summer).
 - [ ] Type-safe Transaction templates
 - [ ] Documentation with guides and examples
 - [ ] Program template library for common tasks
+- [x] Helpers to assist with Anchor Instructions
 
 # Usage
 
@@ -142,6 +143,67 @@ let transactionId = try! solana.action.sendSOL(
             amount: 10
 ){ result in
  // process
+}
+```
+
+### Anchor Helpers
+
+Create your own structs that represents instructions of your anchor program; then create, sign, and send transactions to your program.
+
+#### Example
+
+Define your Anchor instruction
+
+```swift
+struct DepositFunds: AnchorInstruction {
+    let userPdaBump: UInt8
+    let bankPdaBump: UInt8
+    let depositAmount: UInt64
+
+    // MARK: - AnchorInstruction implementation
+
+    public var methodName: String { "deposit_funds" } // Name of Rust function in Anchor program
+
+    public func serialize(to writer: inout Data) throws {
+        // serialize parameters to Rust function
+        try userPdaBump.serialize(to: &writer)
+        try bankPdaBump.serialize(to: &writer)
+        try depositAmount.serialize(to: &writer)
+    }
+}
+```
+
+Construct and send a transaction from your instruction
+
+```swift
+solana.auth.account.onSuccess { account in
+    guard let contractId = PublicKey(string: "<your_deployed_program_address>"),
+          case let .success(userPda) = PublicKey.findAnchorPda(anchorSeed: account.publicKey.data, programId: contractId),
+          case let .success(bankPda) = PublicKey.findAnchorPda(anchorSeed: "bank".data(using: .utf8)!, programId: contractId)
+    else {
+        return
+    }
+
+    let accounts = [
+        Account.Meta(publicKey: account.publicKey, isSigner: true, isWritable: true),
+        Account.Meta(anchorPda: userPda, isWritable: true),
+        Account.Meta(anchorPda: bankPda, isWritable: true),
+        Account.Meta(publicKey: PublicKey.programId, isSigner: false, isWritable: false),
+    ]
+    let instruction = DepositFunds(userPdaBump: userPda.bump, bankPdaBump: bankPda.bump, depositAmount: sol.toLamport(decimals: 9))
+    guard let depositTx = TransactionInstruction(accounts: accounts,
+                                                 programId: contractId,
+                                                 anchorInstruction: instruction) else {
+        // serialization threw
+        return
+    }
+
+    solana.action.serializeAndSendWithFee(instructions: [depositTx], signers: [account]) { result in
+        switch result {
+        case .success(let txId): print("Success! \(txId)")
+        case .failure(let err): print("Failed! \(err)")
+        }
+    }
 }
 ```
 
